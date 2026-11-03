@@ -1,0 +1,10 @@
+{
+  "1": ["Trim tab", "Flap", "Tutya", "Rubrail", "Borda camı", "Lumboz", "Su hattı", "Karina", "Bodoslama", "Kıç platform", "Kıç platform mekanizması", "Yüzme merdiveni", "Acil çıkış merdiveni", "Sürat paraketesi", "Derinlik paraketesi", "Deniz suyu emiş kovanı", "Deniz suyu emiş süzgeci", "Su atış kovanı", "Manevra pervanesi", "Demir koruma plakası", "Jelkot"],
+  "2": ["Pervane", "Şaft", "Şaft lastik yatağı", "Dümen mili", "Dümen yekesi", "Braket"],
+  "3": ["Zincir", "Zincir stoperi", "Zincirlik", "Zincir ırgatı", "Halat ırgatı", "Capstan", "Demir loçası", "Koçboynuzu", "Vardavela", "Küpeşte", "Parapet", "Tik kaplama", "Sika armuz", "Sika mastik", "Minder", "Bimini", "Gölgelik", "Hatch", "Pleksi rüzgarlık", "Flybridge merdiveni", "Barbekü", "Hardtop", "Pasarella", "Havuzluk masası", "Yan yürüme yolu", "Pantograf kapı", "Üst bina", "Ön cam", "Silecek", "Nezaket aydınlatması", "Phifer kapama", "Gaz kolu", "Pusula"],
+  "4": ["Kamara kapısı", "Perde mekanizması", "Başucu lambası", "Komodin", "Yatak", "Banyo fanı", "Lavabo", "Tuvalet", "Ayna", "Kanepe", "Mobilya", "Mutfak", "Çamaşır makinesi", "Kaptan koltuğu", "Tavan paneli", "Kumaş döşeme", "Deri döşeme", "Salon zemini", "Dolap gaz pistonu", "Pushbutton kilit"],
+  "5": ["Ana makine", "Jeneratör", "Vibrasyon takozu", "Deniz suyu emiş vanası", "Webasto", "Egzoz hortumu", "Yakıt filtresi", "Yakıt hortumu", "Impeller", "Eşanjör", "Sintine", "Sintine pompası", "Klima", "Su pompası", "IPS pod", "Hidrolik silindir"],
+  "6": ["Pis su tankı", "Gri su tankı", "Tatlı su tankı", "Transfer tankı", "Hidrofor", "Boiler", "Su yapıcı", "Musluk", "Washdown"],
+  "7": ["Korna", "MFD", "AIS", "VHF telsiz", "Radar", "GPS", "Otopilot", "Akü", "Akü grubu", "Zincir sayacı", "Projektör", "Uydu TV", "Müzik sistemi", "Kamera", "Carling switch", "Derinlik ekranı", "Sigorta"],
+  "8": ["Can simidi", "Can yeleği", "Can salı", "Çakar fener", "Yangın söndürücü", "Yangın tüpü", "Ruhsatname", "Kullanıcı kılavuzu", "HIN", "EPIRB"]
+}

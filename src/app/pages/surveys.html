@@ -1,0 +1,70 @@
+<main class="page has-bottom">
+  <header class="top-row">
+    <h1 class="large-title">Sörveyler</h1>
+    <a class="icon-btn" routerLink="/ayarlar" aria-label="Ayarlar"><app-icon name="settings" /></a>
+  </header>
+
+  <label class="search">
+    <app-icon name="search" [size]="18" />
+    <input type="search" placeholder="Tekne, marina ara" aria-label="Sörvey ara" (input)="onQuery($event)" />
+  </label>
+
+  @if (filtered().length) {
+    <ul class="list">
+      @for (row of filtered(); track row.survey.id) {
+        <li class="action-row">
+          <a class="list-row" [routerLink]="['/s', row.survey.id, 'bulgular']">
+            <span class="tile"><app-icon name="sailboat" /></span>
+            <span class="grow">
+              <span class="row-title">{{ title(row.survey) }}</span>
+              <span class="row-sub">
+                {{ row.survey.location || 'Konum yok' }} · {{ row.notes }} not · {{ row.photos }} foto
+              </span>
+            </span>
+            @if (needsBackup(row)) {
+              <span class="tag warn">Yedeklenmedi</span>
+            }
+          </a>
+          <button type="button" class="icon-btn" [attr.aria-label]="title(row.survey) + ' sörveyini sil'" (click)="remove(row)">
+            <app-icon name="trash" [size]="18" />
+          </button>
+        </li>
+      }
+    </ul>
+  } @else if (query()) {
+    <p class="empty">"{{ query() }}" ile eşleşen sörvey yok.</p>
+  } @else {
+    <div class="empty">
+      <h2>İlk sörveyini aç</h2>
+      <p>Teknede notları ve fotoğrafları buraya kaydedersin, sonra rapor için bilgisayara aktarırsın.</p>
+    </div>
+  }
+
+  <div class="bottom-bar">
+    <button type="button" class="btn primary wide" (click)="creating.set(true)">
+      <app-icon name="plus" [size]="20" /> Yeni sörvey
+    </button>
+  </div>
+</main>
+
+@if (creating()) {
+  <div class="scrim" (click)="creating.set(false)"></div>
+  <form class="sheet" (submit)="create($event)">
+    <div class="sheet-head">
+      <button type="button" class="link" (click)="creating.set(false)">İptal</button>
+      <button type="submit" class="btn primary">Başlat</button>
+    </div>
+    <h2 class="sheet-title">Yeni sörvey</h2>
+    <div class="form">
+      <label>Model<input name="model" placeholder="Ferretti 780" autocomplete="off" /></label>
+      <label>Tekne adı<input name="name" placeholder="M/Y Deniz" autocomplete="off" /></label>
+      <label>Konum<input name="location" placeholder="Kairos Marina, Datça" autocomplete="off" /></label>
+      <label>Tarih<input name="date" type="date" [value]="today" /></label>
+      <label>Rapor no<input name="reportNo" placeholder="2026-001" autocomplete="off" /></label>
+      <label>Rapor sahibi<input name="client" placeholder="Müşteri adı" autocomplete="off" /></label>
+    </div>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+  </form>
+}

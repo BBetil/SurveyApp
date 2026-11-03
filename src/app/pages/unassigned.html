@@ -1,0 +1,60 @@
+<main class="page">
+  <header class="nav-row">
+    <button type="button" class="link" (click)="location.back()"><app-icon name="arrow-left" [size]="20" /> Bulgular</button>
+    <label class="link">
+      <app-icon name="library-photo" [size]="20" /> Galeriden al
+      <input type="file" accept="image/*" multiple hidden (change)="onFiles($event)" />
+    </label>
+  </header>
+  <h1 class="large-title">Atanmamış fotoğraflar</h1>
+
+  @if (importing(); as p) {
+    <p class="subtitle">Fotoğraflar işleniyor: {{ p.done }} / {{ p.total }}</p>
+  }
+  @if (message()) {
+    <p class="subtitle">{{ message() }}</p>
+  }
+
+  @if (matchedCount()) {
+    <button type="button" class="btn primary wide" (click)="assignAll()">
+      <app-icon name="check" [size]="20" /> Önerilen {{ matchedCount() }} fotoğrafı ata
+    </button>
+  }
+
+  @if (items().length) {
+    <ul class="photo-list">
+      @for (item of items(); track item.photo.id) {
+        <li class="photo-row">
+          <img [src]="thumbUrl(item.photo)" alt="" loading="lazy" />
+          <div class="grow">
+            <div class="row-sub">
+              {{ item.photo.takenAt | date: 'dd.MM HH:mm' }}
+              <button type="button" class="icon-link" aria-label="Fotoğrafı sil" (click)="remove(item.photo)"><app-icon name="trash" [size]="16" /></button>
+            </div>
+            @if (item.match; as note) {
+              <button type="button" class="btn small wide-text" (click)="assign(item.photo, note.id)">
+                <app-icon name="check" [size]="16" /> {{ label(note) }}
+              </button>
+            }
+            <div class="row-gap">
+              <button type="button" class="btn small" (click)="newNote(item.photo)">Yeni not</button>
+              @if (notes().length) {
+                <select class="btn small grow select" aria-label="Başka nota ata" (change)="onPick(item.photo, $event)">
+                  <option value="">Başka nota ata</option>
+                  @for (note of notes(); track note.id) {
+                    <option [value]="note.id">{{ label(note) }}</option>
+                  }
+                </select>
+              }
+            </div>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else if (!importing()) {
+    <div class="empty">
+      <h2>Bekleyen fotoğraf yok</h2>
+      <p>Telefonla çektiğin fotoğrafları galeriden toplu al. Çekim saatine en yakın notu önereyim.</p>
+    </div>
+  }
+</main>

@@ -1,0 +1,50 @@
+<main class="page has-tabbar">
+  <h1 class="large-title first">Tekne</h1>
+
+  @if (survey(); as s) {
+    <h2 class="group-title">Plaka ve kılavuz fotoğrafları</h2>
+    <p class="subtitle">Diğer tekne bilgileri raporda bu fotoğraflardan doldurulacak.</p>
+    <div class="plates">
+      @for (plate of plates(); track plate.kind) {
+        <div class="plate">
+          <label class="plate-add">
+            <app-icon name="camera-plus" [size]="20" /> {{ plate.label }}
+            <input type="file" accept="image/*" multiple hidden (change)="onPlate(plate.kind, $event)" />
+          </label>
+          @for (photo of plate.photos; track photo.id) {
+            <button type="button" class="plate-thumb" aria-label="Fotoğrafı sil" (click)="removePhoto(photo)">
+              <img [src]="thumbUrl(photo)" alt="" />
+            </button>
+          }
+        </div>
+      }
+    </div>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <h2 class="group-title">Saatler ve HIN</h2>
+    <div class="form">
+      <label>H.I.N.<input autocapitalize="characters" autocomplete="off" placeholder="SI-SVP48106D323" [value]="s.vessel.hin ?? ''" (input)="setField('vessel.hin', $event)" /></label>
+    </div>
+    <div class="form two">
+      <label>Makine saati iskele<input inputmode="numeric" [value]="s.vessel.engineHours?.port ?? ''" (input)="setField('vessel.engineHours.port', $event)" /></label>
+      <label>Makine saati sancak<input inputmode="numeric" [value]="s.vessel.engineHours?.starboard ?? ''" (input)="setField('vessel.engineHours.starboard', $event)" /></label>
+    </div>
+    <div class="form">
+      <label>Jeneratör saati<input placeholder="21 saat" [value]="s.vessel.generatorHours ?? ''" (input)="setField('vessel.generatorHours', $event)" /></label>
+    </div>
+
+    <h2 class="group-title">Sörvey bilgileri</h2>
+    <div class="form">
+      <label>Model<input [value]="s.vessel.model ?? ''" (input)="setField('vessel.model', $event)" /></label>
+      <label>Tekne adı<input [value]="s.vessel.name ?? ''" (input)="setField('vessel.name', $event)" /></label>
+      <label>Konum<input [value]="s.location" (input)="setField('location', $event)" /></label>
+      <label>Kara testi tarihi<input type="date" [value]="s.dates.land ?? ''" (change)="setField('dates.land', $event)" /></label>
+      <label>Rapor no<input [value]="s.reportNo" (input)="setField('reportNo', $event)" /></label>
+      <label>Rapor sahibi<input [value]="s.client" (input)="setField('client', $event)" /></label>
+    </div>
+
+    <button type="button" class="btn danger wide spaced" (click)="remove()"><app-icon name="trash" [size]="20" /> Sörveyi sil</button>
+  }
+</main>

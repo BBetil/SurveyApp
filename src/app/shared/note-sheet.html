@@ -1,0 +1,101 @@
+<div class="scrim" (click)="cancel()"></div>
+<section class="sheet" role="dialog" aria-modal="true" [attr.aria-label]="isEdit ? 'Notu düzenle' : 'Yeni not'">
+  <div class="sheet-head">
+    <button type="button" class="link" (click)="cancel()">İptal</button>
+    <span class="sheet-saved">
+      @if (savedCount()) {
+        <app-icon name="check" [size]="16" /> {{ savedCount() }} kaydedildi
+      }
+    </span>
+    <div class="row-gap">
+      <button type="button" class="btn" (click)="save(false)">Kaydet</button>
+      @if (!isEdit) {
+        <button type="button" class="btn primary" (click)="save(true)">Kaydet + yeni</button>
+      }
+    </div>
+  </div>
+
+  <div class="strip">
+    @for (photo of photos(); track photo.id) {
+      <div class="strip-item">
+        <img [src]="thumbUrl(photo)" alt="" />
+        <button type="button" class="strip-x" aria-label="Fotoğrafı çıkar" (click)="removePhoto(photo)">
+          <app-icon name="x" [size]="14" />
+        </button>
+      </div>
+    }
+    @for (n of processing() ? [1] : []; track n) {
+      <div class="strip-item strip-busy">{{ processing() }}…</div>
+    }
+    <label class="strip-add">
+      <app-icon name="camera-plus" />
+      <span>Çek</span>
+      <input type="file" accept="image/*" capture="environment" hidden (change)="onFiles($event)" />
+    </label>
+    <label class="strip-add">
+      <app-icon name="library-photo" />
+      <span>Galeri</span>
+      <input type="file" accept="image/*" multiple hidden (change)="onFiles($event)" />
+    </label>
+  </div>
+
+  <textarea
+    #noteText
+    class="note-input"
+    rows="3"
+    placeholder="Zincir stoperinin dili eksik"
+    aria-label="Not"
+    [value]="text()"
+    (input)="onText($event)"
+    (click)="onCaret($event)"
+    (keyup)="onCaret($event)"
+  ></textarea>
+  @if (completions(); as found) {
+    <div class="chips scroll completions" aria-label="Parça önerileri">
+      @for (part of found.parts; track part.id) {
+        <button type="button" class="chip suggested" (mousedown)="$event.preventDefault()" (click)="insertPart(part)">{{ part.name }}</button>
+      }
+    </div>
+  }
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <h3 class="field-title">
+    Bölüm
+    @if (!section() && suggested()) {
+      <span class="accent">· öneri</span>
+    }
+  </h3>
+  <div class="chips">
+    @for (s of sections; track s.no) {
+      <button
+        type="button"
+        class="chip"
+        [class.selected]="section() === s.no"
+        [class.suggested]="!section() && suggested() === s.no"
+        (click)="toggle(section, s.no)"
+      >
+        {{ s.short }}
+      </button>
+    }
+  </div>
+
+  <h3 class="field-title">Durum</h3>
+  <div class="chips">
+    @for (s of statuses; track s[0]) {
+      <button type="button" class="chip" [class.selected-warn]="status() === s[0]" (click)="toggle(status, s[0])">
+        {{ s[1] }}
+      </button>
+    }
+  </div>
+
+  <h3 class="field-title">Derece <span class="muted">· boş bırakılabilir</span></h3>
+  <div class="chips">
+    @for (g of grades; track g) {
+      <button type="button" class="chip grade" [class]="grade() === g ? 'chip grade g-' + g : 'chip grade'" (click)="toggle(grade, g)">
+        {{ g }}
+      </button>
+    }
+  </div>
+</section>

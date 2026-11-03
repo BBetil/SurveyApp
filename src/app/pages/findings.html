@@ -1,7 +1,10 @@
 <main class="page has-tabbar">
   <header class="nav-row">
     <a class="link" routerLink="/"><app-icon name="arrow-left" [size]="20" /> Sörveyler</a>
-    <button type="button" class="link" (click)="startExport()"><app-icon name="share" [size]="20" /> Dışa aktar</button>
+    <div class="row-gap">
+      <a class="link" [routerLink]="['/s', surveyId, 'rapor']"><app-icon name="clipboard-list" [size]="20" /> Rapor</a>
+      <button type="button" class="link" (click)="startExport()"><app-icon name="share" [size]="20" /> Dışa aktar</button>
+    </div>
   </header>
   @if (survey(); as s) {
     <h1 class="large-title">{{ title(s) }}</h1>

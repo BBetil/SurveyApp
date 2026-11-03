@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Findings } from './pages/findings';
 import { NoteDetail } from './pages/note-detail';
+import { NoteImport } from './pages/note-import';
 import { PartsPage } from './pages/parts';
 import { Settings } from './pages/settings';
 import { SurveyShell } from './pages/survey-shell';
@@ -13,6 +14,11 @@ export const routes: Routes = [
   { path: 'ayarlar', component: Settings, title: 'Ayarlar' },
   { path: 'ayarlar/parcalar', component: PartsPage, title: 'Parçalar' },
   { path: 's/:id/not/:noteId', component: NoteDetail, title: 'Not' },
+  {
+    path: 's/:id/rapor',
+    loadComponent: () => import('./pages/report').then((m) => m.Report),
+    title: 'Rapor',
+  },
   { path: 's/:id/fotolar', component: Unassigned, title: 'Atanmamış fotoğraflar' },
   {
     path: 's/:id',
@@ -20,6 +26,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'bulgular', pathMatch: 'full' },
       { path: 'bulgular', component: Findings, title: 'Bulgular' },
+      { path: 'ice-aktar', component: NoteImport, title: 'İçe aktar' },
       { path: 'tekne', component: Vessel, title: 'Tekne' },
     ],
   },

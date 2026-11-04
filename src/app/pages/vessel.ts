@@ -4,10 +4,11 @@ import { addPhoto, db, deletePhoto, deleteSurvey, live, setSurveyField, thumbUrl
 import { processImage } from '../core/image';
 import { Photo, Survey, VESSEL_KINDS, VesselKind } from '../core/models';
 import { Icon } from '../shared/icon';
+import { PhotoViewer } from '../shared/photo-viewer';
 
 @Component({
   selector: 'app-vessel',
-  imports: [Icon],
+  imports: [Icon, PhotoViewer],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './vessel.html',
 })
@@ -18,6 +19,7 @@ export class Vessel implements OnInit {
   protected readonly thumbUrl = thumbUrl;
   protected readonly survey = signal<Survey | undefined>(undefined);
   protected readonly error = signal('');
+  protected readonly viewing = signal<Photo | null>(null);
   private readonly photos = live<Photo[]>(() => db.photos.where({ surveyId: this.surveyId }).toArray(), []);
 
   protected readonly plates = computed(() =>
@@ -48,7 +50,9 @@ export class Vessel implements OnInit {
   }
 
   protected removePhoto(photo: Photo) {
-    if (confirm('Fotoğraf silinsin mi?')) void deletePhoto(photo.id);
+    if (!confirm('Fotoğraf kalıcı olarak silinsin mi?')) return;
+    this.viewing.set(null);
+    void deletePhoto(photo.id);
   }
 
   protected async remove() {

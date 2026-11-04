@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router, RouterLink } from '@angular/router';
 import { db, live } from '../core/db';
 import { importSurveyZip } from '../core/export';
+import { importTemplateFile, loadTemplate, ReportTemplate } from '../core/report-template';
 import { loadSurveyor, saveSurveyor } from '../core/settings';
 import { Icon } from '../shared/icon';
 
@@ -33,6 +34,16 @@ import { Icon } from '../shared/icon';
       </a>
 
 
+      <h2 class="group-title">Rapor şablonu</h2>
+      <p class="subtitle">{{ template() ? 'Yüklü. Yenisini seçersen eskisinin yerine geçer.' : 'Yüklü değil. Sabit rapor metinleri bu dosyadan gelir.' }}</p>
+      <label class="btn wide">
+        <app-icon name="upload" [size]="20" /> Şablon seç
+        <input type="file" accept=".json,application/json" hidden (change)="onTemplate($event)" />
+      </label>
+      @if (templateError()) {
+        <p class="error">{{ templateError() }}</p>
+      }
+
       <h2 class="group-title">Yedekten geri yükle</h2>
       <p class="subtitle">Dışa aktardığın zip dosyasını seç. Sörvey telefonda varsa kopya olarak eklenir, parça listesi birleştirilir.</p>
       <label class="btn wide">
@@ -54,6 +65,22 @@ export class Settings {
   protected readonly busy = signal(false);
   protected readonly error = signal('');
   protected readonly partCount = live(() => db.parts.count(), 0);
+  protected readonly template = live<ReportTemplate | undefined>(loadTemplate, undefined);
+  protected readonly templateError = signal('');
+
+  protected async onTemplate(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    this.templateError.set('');
+    try {
+      await importTemplateFile(file);
+    } catch (e) {
+      console.error(e);
+      this.templateError.set('Bu dosya rapor şablonu olarak okunamadı.');
+    }
+  }
 
   protected set(key: 'name' | 'title', event: Event) {
     this.surveyor[key] = (event.target as HTMLInputElement).value;

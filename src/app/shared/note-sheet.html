@@ -18,9 +18,8 @@
   <div class="strip">
     @for (photo of photos(); track photo.id) {
       <div class="strip-item">
-        <img [src]="thumbUrl(photo)" alt="" />
-        <button type="button" class="strip-x" aria-label="Fotoğrafı çıkar" (click)="removePhoto(photo)">
-          <app-icon name="x" [size]="14" />
+        <button type="button" class="strip-open" aria-label="Fotoğrafı aç" (click)="viewing.set(photo)">
+          <img [src]="thumbUrl(photo)" alt="" />
         </button>
       </div>
     }
@@ -99,3 +98,7 @@
     }
   </div>
 </section>
+
+@if (viewing(); as photo) {
+  <app-photo-viewer [photo]="photo" removeLabel="Nottan çıkar" (closed)="viewing.set(null)" (removed)="confirmRemove(photo)" />
+}

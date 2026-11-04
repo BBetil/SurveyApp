@@ -25,7 +25,9 @@
     <ul class="photo-list">
       @for (item of items(); track item.photo.id) {
         <li class="photo-row">
-          <img [src]="thumbUrl(item.photo)" alt="" loading="lazy" />
+          <button type="button" class="photo-open" aria-label="Fotoğrafı aç" (click)="viewing.set(item.photo)">
+            <img [src]="thumbUrl(item.photo)" alt="" loading="lazy" />
+          </button>
           <div class="grow">
             <div class="row-sub">
               {{ item.photo.takenAt | date: 'dd.MM HH:mm' }}
@@ -58,3 +60,7 @@
     </div>
   }
 </main>
+
+@if (viewing(); as photo) {
+  <app-photo-viewer [photo]="photo" (closed)="viewing.set(null)" (removed)="remove(photo)" />
+}

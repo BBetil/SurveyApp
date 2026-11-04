@@ -12,7 +12,7 @@
             <input type="file" accept="image/*" multiple hidden (change)="onPlate(plate.kind, $event)" />
           </label>
           @for (photo of plate.photos; track photo.id) {
-            <button type="button" class="plate-thumb" aria-label="Fotoğrafı sil" (click)="removePhoto(photo)">
+            <button type="button" class="plate-thumb" aria-label="Fotoğrafı aç" (click)="viewing.set(photo)">
               <img [src]="thumbUrl(photo)" alt="" />
             </button>
           }
@@ -48,3 +48,7 @@
     <button type="button" class="btn danger wide spaced" (click)="remove()"><app-icon name="trash" [size]="20" /> Sörveyi sil</button>
   }
 </main>
+
+@if (viewing(); as photo) {
+  <app-photo-viewer [photo]="photo" (closed)="viewing.set(null)" (removed)="removePhoto(photo)" />
+}

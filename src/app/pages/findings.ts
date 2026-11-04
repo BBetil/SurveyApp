@@ -1,9 +1,9 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { db, deleteNote, live, thumbUrl } from '../core/db';
+import { db, deleteNote, deleteNotes, live, thumbUrl } from '../core/db';
 import { buildSurveyZip, canShareFile, downloadFile, markExported, SurveyZip } from '../core/export';
-import { effectiveSection, normalizeTr, Note, Photo, SECTIONS, STATUS_LABELS, Survey, surveyTitle } from '../core/models';
+import { effectiveSection, normalizeTr, Note, NoteStatus, Photo, SECTIONS, STATUS_LABELS, Survey, surveyTitle } from '../core/models';
 import { NoteEditor } from '../core/note-editor';
 import { Icon } from '../shared/icon';
 
@@ -11,7 +11,7 @@ type Filter = 'all' | 'none' | number;
 
 @Component({
   selector: 'app-findings',
-  imports: [DatePipe, Icon, RouterLink],
+  imports: [DatePipe, Icon, NgTemplateOutlet, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './findings.html',
 })
@@ -28,7 +28,6 @@ export class Findings {
 
   protected readonly title = surveyTitle;
   protected readonly thumbUrl = thumbUrl;
-  protected readonly statusLabels = STATUS_LABELS;
   protected readonly query = signal('');
   protected readonly filter = signal<Filter>('all');
   protected readonly zip = signal<SurveyZip | null>(null);
@@ -57,6 +56,43 @@ export class Findings {
       return !q || normalizeTr(`${n.text} ${this.sectionLabel(n)}`).includes(q);
     });
   });
+
+  protected readonly selecting = signal(false);
+  protected readonly selected = signal<ReadonlySet<string>>(new Set());
+  /** Arama ya da filtre değişince gizlenen notlar silinmesin diye yalnızca görünenler sayılır */
+  protected readonly selectedVisible = computed(() => this.visible().filter((n) => this.selected().has(n.id)));
+  protected readonly allVisibleSelected = computed(
+    () => this.visible().length > 0 && this.selectedVisible().length === this.visible().length,
+  );
+
+  protected toggleNote(id: string) {
+    this.selected.update((set) => {
+      const next = new Set(set);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }
+
+  protected toggleAll() {
+    this.selected.set(this.allVisibleSelected() ? new Set() : new Set(this.visible().map((n) => n.id)));
+  }
+
+  protected stopSelecting() {
+    this.selecting.set(false);
+    this.selected.set(new Set());
+  }
+
+  protected async removeSelected() {
+    const notes = this.selectedVisible();
+    const photos = notes.some((n) => n.photoIds.length) ? ' Fotoğrafları atanmamış olarak kalır.' : '';
+    if (!confirm(`${notes.length} not silinsin mi?${photos}`)) return;
+    await deleteNotes(notes);
+    this.stopSelecting();
+  }
+
+  protected statusLabel(status: NoteStatus): string {
+    return STATUS_LABELS[status];
+  }
 
   protected sectionLabel(note: Note): string {
     return SECTIONS.find((s) => s.no === effectiveSection(note))?.short ?? 'Etiketsiz';

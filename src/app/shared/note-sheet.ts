@@ -6,6 +6,7 @@ import { Grade, GRADES, normalizeTr, Note, NoteStatus, Part, Photo, SECTIONS, ST
 import { NoteEditor } from '../core/note-editor';
 import { suggestSection } from '../core/section-suggest';
 import { Icon } from './icon';
+import { PhotoViewer } from './photo-viewer';
 
 /** Cümle içinde küçük harfle yazar; VHF gibi kısaltmalara dokunmaz. */
 function inSentence(word: string): string {
@@ -16,7 +17,7 @@ function inSentence(word: string): string {
 
 @Component({
   selector: 'app-note-sheet',
-  imports: [Icon],
+  imports: [Icon, PhotoViewer],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './note-sheet.html',
 })
@@ -39,6 +40,7 @@ export class NoteSheet implements OnInit {
   protected readonly photos = signal<Photo[]>([]);
   protected readonly processing = signal(0);
   protected readonly error = signal('');
+  protected readonly viewing = signal<Photo | null>(null);
   protected readonly savedCount = signal(0);
   private readonly caret = signal(0);
   private readonly partTerms = computed(() => this.parts().map((p) => ({ key: normalizeTr(p.name), section: p.section })));
@@ -95,7 +97,13 @@ export class NoteSheet implements OnInit {
     if (files.length) void this.addFiles(files);
   }
 
-  protected async removePhoto(photo: Photo) {
+  protected async confirmRemove(photo: Photo) {
+    if (!confirm('Fotoğraf nottan çıkarılsın mı? Kaydedince silinir.')) return;
+    this.viewing.set(null);
+    await this.removePhoto(photo);
+  }
+
+  private async removePhoto(photo: Photo) {
     this.photos.update((list) => list.filter((p) => p.id !== photo.id));
     if (this.added.delete(photo.id)) await deletePhoto(photo.id);
   }

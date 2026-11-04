@@ -1,5 +1,6 @@
 import { db } from './db';
 import { normalizeTr, Part, uid } from './models';
+import { loadTemplate, ReportTemplate, saveTemplate } from './report-template';
 
 const MAX_COMPLETIONS = 6;
 
@@ -58,11 +59,12 @@ export function setPartSection(id: string, section: number) {
 
 export interface ListsBackup {
   parts: Omit<Part, 'id'>[];
+  reportTemplate?: ReportTemplate;
 }
 
 export async function exportLists(): Promise<ListsBackup> {
   const parts = await db.parts.toArray();
-  return { parts: parts.map(({ id: _id, ...rest }) => rest) };
+  return { parts: parts.map(({ id: _id, ...rest }) => rest), reportTemplate: await loadTemplate() };
 }
 
 /** Yedekteki parçaları ekler. Aynı adlı parçada daha yeni düzenlenmiş olan kalır, listeden hiçbir şey silinmez. */
@@ -73,4 +75,5 @@ export async function mergeLists(backup: Partial<ListsBackup>) {
     if (!existing) await db.parts.add({ ...part, id: uid() });
     else if (part.updatedAt > existing.updatedAt) await db.parts.update(existing.id, { ...part });
   }
+  if (backup.reportTemplate && !(await loadTemplate())) await saveTemplate(backup.reportTemplate);
 }

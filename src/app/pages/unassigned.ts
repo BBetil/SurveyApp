@@ -6,13 +6,14 @@ import { processImage } from '../core/image';
 import { Note, Photo } from '../core/models';
 import { NoteEditor } from '../core/note-editor';
 import { Icon } from '../shared/icon';
+import { PhotoViewer } from '../shared/photo-viewer';
 
 /** Çekim saati bu kadar yakın olan not önerilir */
 const MATCH_WINDOW_MS = 30 * 60 * 1000;
 
 @Component({
   selector: 'app-unassigned',
-  imports: [DatePipe, Icon],
+  imports: [DatePipe, Icon, PhotoViewer],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './unassigned.html',
 })
@@ -24,6 +25,7 @@ export class Unassigned {
   protected readonly thumbUrl = thumbUrl;
   protected readonly importing = signal<{ done: number; total: number } | null>(null);
   protected readonly message = signal('');
+  protected readonly viewing = signal<Photo | null>(null);
 
   private readonly photos = live<Photo[]>(() => db.photos.where({ surveyId: this.surveyId }).sortBy('takenAt'), []);
   protected readonly notes = live<Note[]>(() => db.notes.where({ surveyId: this.surveyId }).sortBy('createdAt'), []);
@@ -98,7 +100,9 @@ export class Unassigned {
   }
 
   protected remove(photo: Photo) {
-    if (confirm('Fotoğraf silinsin mi?')) void deletePhoto(photo.id);
+    if (!confirm('Fotoğraf silinsin mi?')) return;
+    this.viewing.set(null);
+    void deletePhoto(photo.id);
   }
 
   protected label(note: Note) {

@@ -16,6 +16,7 @@ class SorveyDb extends Dexie {
   notes!: Table<Note, string>;
   photos!: Table<Photo, string>;
   parts!: Table<Part, string>;
+  kv!: Table<{ key: string; value: unknown }, string>;
 
   constructor() {
     super('sorvey');
@@ -26,6 +27,7 @@ class SorveyDb extends Dexie {
     });
     this.version(2).stores({ parts: 'id' }).upgrade(seedParts);
     this.version(3).stores({ locations: null });
+    this.version(4).stores({ kv: 'key' });
     this.on('populate', seedParts);
   }
 }
@@ -106,6 +108,10 @@ export async function deleteNote(note: Note) {
     await db.notes.delete(note.id);
   });
   await touch(note.surveyId);
+}
+
+export async function deleteNotes(notes: Note[]) {
+  for (const note of notes) await deleteNote(note);
 }
 
 export async function assignPhoto(photoId: string, noteId: string) {

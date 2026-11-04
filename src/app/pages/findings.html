@@ -33,11 +33,25 @@
     </a>
   }
 
-  @if (visible().length) {
-    <ul class="list">
-      @for (note of visible(); track note.id) {
-        <li class="action-row">
-          <a class="list-row top" [routerLink]="['/s', surveyId, 'not', note.id]">
+  @if (notes().length) {
+    @if (selecting()) {
+      <div class="select-bar">
+        <button type="button" class="link" (click)="toggleAll()">{{ allVisibleSelected() ? 'Hiçbirini seçme' : 'Tümünü seç' }}</button>
+        <div class="row-gap">
+          <button type="button" class="btn small danger" [disabled]="!selectedVisible().length" (click)="removeSelected()">
+            <app-icon name="trash" [size]="16" /> {{ selectedVisible().length }} notu sil
+          </button>
+          <button type="button" class="btn small" (click)="stopSelecting()">Bitti</button>
+        </div>
+      </div>
+    } @else {
+      <div class="select-start">
+        <button type="button" class="link" (click)="selecting.set(true)">Seç</button>
+      </div>
+    }
+  }
+
+  <ng-template #rowBody let-note>
             <span class="tile thumb">
               @if (firstPhoto(note); as photo) {
                 <img [src]="thumbUrl(photo)" alt="" loading="lazy" />
@@ -54,17 +68,32 @@
                 {{ note.createdAt | date: 'HH:mm' }} ·
                 <span [class.accent-soft]="!note.section && note.sectionSuggested">{{ sectionLabel(note) }}</span>
                 @if (note.status) {
-                  <span class="tag warn">{{ statusLabels[note.status] }}</span>
+                  <span class="tag warn">{{ statusLabel(note.status) }}</span>
                 }
                 @if (note.grade) {
                   <span class="tag" [class]="'tag g-' + note.grade">{{ note.grade }}</span>
                 }
               </span>
             </span>
-          </a>
-          <button type="button" class="icon-btn" aria-label="Notu sil" (click)="removeNote(note)">
-            <app-icon name="trash" [size]="18" />
-          </button>
+  </ng-template>
+
+  @if (visible().length) {
+    <ul class="list">
+      @for (note of visible(); track note.id) {
+        <li class="action-row">
+          @if (selecting()) {
+            <label class="list-row top select-row">
+              <input type="checkbox" [checked]="selected().has(note.id)" [attr.aria-label]="note.text || 'Metinsiz not'" (change)="toggleNote(note.id)" />
+              <ng-container [ngTemplateOutlet]="rowBody" [ngTemplateOutletContext]="{ $implicit: note }" />
+            </label>
+          } @else {
+            <a class="list-row top" [routerLink]="['/s', surveyId, 'not', note.id]">
+              <ng-container [ngTemplateOutlet]="rowBody" [ngTemplateOutletContext]="{ $implicit: note }" />
+            </a>
+            <button type="button" class="icon-btn" aria-label="Notu sil" (click)="removeNote(note)">
+              <app-icon name="trash" [size]="18" />
+            </button>
+          }
         </li>
       }
     </ul>
